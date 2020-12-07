@@ -1,0 +1,2 @@
+C:\Users\tobst\cmder\unsteady_flows\learnply_2020\Debug\learnply.exe
+C:\Users\tobst\cmder\unsteady_flows\learnply_2020\Debug\learnply.pdb
