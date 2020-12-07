@@ -30,6 +30,7 @@ public:
 
 	int index;
 
+	int vertex_type = -1;
 	int nquads;
 	Quad **quads;
 	int max_quads;
@@ -50,6 +51,8 @@ public:
 
 	Vertex *verts[2];
 
+	//int crossing_check;
+	Vertex* crossing = NULL;
 	int nquads;
 	Quad **quads;
 	
@@ -63,6 +66,9 @@ public:
 	Vertex *verts[4];
 	Edge *edges[4];
 
+	Vertex* singularity = NULL;
+	Vertex* critical = NULL;
+	
 	float area;
 
 	icVector3 normal;
@@ -85,12 +91,15 @@ public:
 	int nedges;
 	int max_edges;
 
+	double minx, maxx, miny, maxy;		/*Dimensions of mesh*/
+
 	icVector3 center;
 	double radius;
 	double area;
 
 	int selected_quad;
 	int selected_vertex;
+
 	unsigned char orientation;  // 0=ccw, 1=cw
 
 	PlyOtherProp *vert_other,*face_other;

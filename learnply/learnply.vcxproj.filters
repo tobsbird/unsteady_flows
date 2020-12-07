@@ -56,5 +56,8 @@
     <ClInclude Include="glError.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="polyline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
