@@ -859,3 +859,25 @@ void Polyhedron::average_normals()
 }
 
 
+void Polyhedron::setMinMax() {
+	for (int i = 0; i < this->nverts; i++) {
+		if (i == 0) {
+			//create minx, miny, maxx, maxy variables in Polyhedron to save the dimension
+			minx = vlist[i]->x;
+			maxx = vlist[i]->x;
+			miny = vlist[i]->y;
+			maxy = vlist[i]->y;
+		}
+		else {
+			if (vlist[i]->x < minx)
+				minx = vlist[i]->x;
+			if (vlist[i]->x > maxx)
+				maxx = vlist[i]->x;
+			if (vlist[i]->y < miny)
+				miny = vlist[i]->y;
+			if (vlist[i]->y > maxy)
+				maxy = vlist[i]->y;
+		}
+	}
+}
+

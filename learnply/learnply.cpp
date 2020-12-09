@@ -183,6 +183,9 @@ void drawPolyline(PolyLine pl, double width = 1.0, double R = 1.0, double G = 0.
 	glDisable(GL_BLEND);
 }
 
+
+
+
 /******************************************************************************
 Main program.
 ******************************************************************************/
@@ -198,7 +201,7 @@ int main(int argc, char* argv[])
 	/*initialize the mesh*/
 	poly->initialize(); // initialize the mesh
 	poly->write_info();
-
+	poly->setMinMax();
 
 	/*init glut and create window*/
 	glutInit(&argc, argv);
@@ -779,13 +782,19 @@ void displayIBFV(void)
 			double y = temp_v->y;
 
 			double tx, ty, dummy;
-
 			gluProject((GLdouble)temp_v->x, (GLdouble)temp_v->y, (GLdouble)temp_v->z,
 				modelview_matrix1, projection_matrix1, viewport1, &tx, &ty, &dummy);
 
 			tx = tx / win_width;
 			ty = ty / win_height;
+			//temp_v->vx = cos(temp_v->y+iframe);
+			//temp_v->vy = sin(temp_v->x-0.5*iframe);
 
+			//temp_v->vx = 0.5*temp_v->x;
+			//temp_v->vy = cos(1.2*temp_v->x-iframe);
+
+			temp_v->vx = sin(iframe);
+			temp_v->vy = 1;
 			icVector2 dp = icVector2(temp_v->vx, temp_v->vy);
 			normalize(dp);
 
@@ -877,6 +886,7 @@ std::vector<std::pair<PolyLine, float>> contours;
 
 void display(void)
 {
+	Sleep(100);
 	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -909,6 +919,11 @@ void display(void)
 Diaplay the polygon with visualization results
 ******************************************************************************/
 
+void drawCordinate(Polyhedron* poly) {
+	drawLineSegment(LineSegment(icVector3(poly->minx, 0, 0), icVector3(poly->maxx, 0, 0)), 3);
+	drawLineSegment(LineSegment(icVector3(0, poly->miny, 0), icVector3(0, poly->maxy, 0)), 3);
+}
+
 
 void display_polyhedron(Polyhedron* poly)
 {
@@ -919,6 +934,8 @@ void display_polyhedron(Polyhedron* poly)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glShadeModel(GL_SMOOTH);
 	CHECK_GL_ERROR();
-
+	
 	displayIBFV();
+	drawCordinate(poly);
+	
 }

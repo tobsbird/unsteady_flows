@@ -133,6 +133,8 @@ public:
 	/*initialization and finalization*/
 	void initialize();
 	void finalize();
+
+	void setMinMax();
 };
 
 #endif /* __LEARNPLY_H__ */
