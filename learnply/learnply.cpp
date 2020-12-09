@@ -72,6 +72,7 @@ void init(void);
 void makePatterns(void);
 
 /*glut attaching functions*/
+void keyboard(unsigned char key, int x, int y);
 void motion(int x, int y);
 void display(void);
 void mouse(int button, int state, int x, int y);
@@ -215,6 +216,7 @@ int main(int argc, char* argv[])
 	makePatterns();
 	
 	/*the render function and callback registration*/
+	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 	glutIdleFunc(display);
@@ -870,6 +872,35 @@ void displayIBFV(void)
 	glShadeModel(GL_SMOOTH);
 	glDisable(GL_BLEND);
 }
+
+/******************************************************************************
+Process a keyboard action.  In particular, exit the program when an
+"escape" is pressed in the window.
+******************************************************************************/
+
+void keyboard(unsigned char key, int x, int y) {
+	int i;
+
+	/* set escape key to exit */
+	switch (key) {
+	case '1':
+		display_mode = 1;
+		glutPostRedisplay();
+		break;
+
+	case '2':
+		display_mode = 2;
+		glutPostRedisplay();
+		break;
+	
+
+	case '3':
+		display_mode = 2;
+		glutPostRedisplay();
+		break;
+	}
+}
+
 /******************************************************************************
 Callback function for scene display
 ******************************************************************************/
@@ -920,5 +951,26 @@ void display_polyhedron(Polyhedron* poly)
 	glShadeModel(GL_SMOOTH);
 	CHECK_GL_ERROR();
 
-	displayIBFV();
+	switch (display_mode) {
+	case 1: // Display unsteady vector flow
+	{
+		printf("1");
+		displayIBFV();
+	}
+	break;
+
+	case 2: // Display steady vector flow
+	{
+		printf("2");
+		displayIBFV();
+	}
+	break;
+
+	case 3: // Display ambient motion vector flow
+	{
+		printf("3");
+		displayIBFV();
+	}
+	break;
+	}
 }
