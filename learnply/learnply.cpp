@@ -881,7 +881,7 @@ void processMenuEvents(int option) {
 Diaplay the polygon with visualization results
 ******************************************************************************/
 
-void drawUnsteady(Polyhedron* poly, double width = 1.0, double R = 1.0, double G = 0.0, double B = 0.0) {
+void drawUnsteady(Polyhedron* poly, double width = 1.0, double R = 0.0, double G = 0.0, double B = 1.0) {
 
 	glDisable(GL_LIGHTING);
 	glEnable(GL_LINE_SMOOTH);
@@ -917,17 +917,8 @@ void drawUnsteady(Polyhedron* poly, double width = 1.0, double R = 1.0, double G
 		double vx = temp_v->vx;
 		double vy = temp_v->vy;
 		double k = (vy) / (vx);
-		double angle = atan(k);
-		//double k = 1 / pow(x, 2.0);
-		/*vx = 1 / sqrt(1.0 + pow(k, 2.0));
-		if (k > 0) {
-			vx = 1 / sqrt(1.0 + pow(k, 2.0));
-			vy = k * vx;
-		}
-		else {
-			vx = -1 / sqrt(1.0 + pow(k, 2.0));
-			vy = k * vx;
-		}*/
+		double rx = (vx - x) / (sin(iframe));
+		double ry = (vy - y) / (1);
 		glVertex3f(vx + x, vy + y, 0);
 
 		//glVertex3f(temp_v->vx * tan(angle) + temp_v->x, temp_v->vy * tan(angle) + temp_v->y, 0);
@@ -976,8 +967,8 @@ void drawDotsInField(Polyhedron* poly, double radius = 0.1, double R = 1.0, doub
 
 void drawCordinate(Polyhedron* poly){ 
 	if (showCoordinate) {
-		drawLineSegment(LineSegment(icVector3(poly->minx, 0, 0), icVector3(poly->maxx, 0, 0)), 3);
-		drawLineSegment(LineSegment(icVector3(0, poly->miny, 0), icVector3(0, poly->maxy, 0)), 3);
+		drawLineSegment(LineSegment(icVector3(poly->minx, 0, 0), icVector3(poly->maxx, 0, 0)), 10, 0, 1, 0);
+		drawLineSegment(LineSegment(icVector3(0, poly->miny, 0), icVector3(0, poly->maxy, 0)), 10, 0, 1, 0);
 	}
 }
 
@@ -1038,6 +1029,7 @@ void convertToSteadyVec2d(Vertex& v, double J[2][2] , double f[2][2], double g[2
 
 
 void drawSteady(Polyhedron* poly, double width = 1.0, double R = 1.0, double G = 0.0, double B = 0.0) {
+	drawUnsteady(poly);
 	glDisable(GL_LIGHTING);
 	glEnable(GL_LINE_SMOOTH);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -1047,17 +1039,29 @@ void drawSteady(Polyhedron* poly, double width = 1.0, double R = 1.0, double G =
 
 	glBegin(GL_LINES);
 	glColor3f(R, G, B);
+	
 	for (int i = 0; i < poly->nverts; i++) {
 		double f[2][2] = { {0,0},{0,0} };
 		double g[2][2] = { {0,0},{0,0} };
 		Vertex* temp_v = poly->vlist[i];
+		
 		setVector(testEqu1, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
 		double J[2][2] = { {0, 1} ,{0,1} };
+		//printf("f1:    %f  %f  %f  %f\n", f[0][0], f[0][1], f[1][0], f[1][1]);
 		convertToSteadyVec2d(*temp_v, J, f, g);
 		//printf("temp: %f  %f  %f  %f\n", temp_v->x, temp_v->y, temp_v->vx, temp_v->vy);
-		//printf("f:    %f  %f  %f  %f\n", f[0][0], f[0][1], f[1][0], f[1][1]);
-		glVertex3f(temp_v->x, temp_v->y, 0);
-		glVertex3f(f[0][1]-f[0][0] + temp_v->x, f[1][1]-f[1][0] + temp_v->y, 0);
+		//printf("f2:    %f  %f  %f  %f\n", f[0][0], f[0][1], f[1][0], f[1][1]);
+		double x = temp_v->x;
+		double y = temp_v->y;
+		double vx = temp_v->vx;
+		double vy = temp_v->vy;
+		double k = (vy) / (vx);
+		glVertex3f(x, y, 0);
+
+
+		
+		//glVertex3f(-(f[0][1] + f[0][0]) * 0.0025, -(f[1][1] + f[1][0]) * 0.0025, 0);
+		glVertex3f((vx + x) - (f[0][1]-f[0][0])*0.0025, (vy + y) - (f[1][1]-f[1][0])*0.0025, 0);
 	}
 	iframe += 1;
 	glEnd();
@@ -1068,7 +1072,7 @@ void drawSteady(Polyhedron* poly, double width = 1.0, double R = 1.0, double G =
 void display_polyhedron(Polyhedron* poly)
 {
 	if (setInterval)
-		Sleep(200);
+		Sleep(1000);
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1., 1.);
 
