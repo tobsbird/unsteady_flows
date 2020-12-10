@@ -30,20 +30,24 @@ std::vector<PolyLine> streamlines;
 const float zoomspeed = 0.9;
 const int view_mode = 0;		// 0 = othogonal, 1=perspective
 const double radius_factor = 1.0;
-int win_width = 800;
-int win_height = 800;
+int win_width = 1000;
+int win_height = 1000;
 float aspectRatio = win_width / win_height;
 /*
 Use keys 1 to 0 to switch among different display modes.
-Each display mode can be designed to show one type 
+Each display mode can be designed to show one type
 visualization result.
 
-Predefined ones: 
+Predefined ones:
 display mode 1: solid rendering
 display mode 2: show wireframes
 display mode 3: render each quad with colors of vertices
 */
 int display_mode = 1;
+
+int showCoordinate = 1;
+int setInterval = 1;
+int showDotsAndArrows = 1;
 
 /*User Interaction related variabes*/
 float s_old, t_old;
@@ -58,9 +62,9 @@ int mouse_mode = -2;	// -1 = no action, 1 = tranlate y, 2 = rotate
 #define SCALE 4.0
 int    Npat = 32;
 int    iframe = 0;
-float  tmax = win_width / (SCALE*NPN);
+float  tmax = win_width / (SCALE * NPN);
 float  dmax = SCALE / win_width;
-unsigned char *pixels;
+unsigned char* pixels;
 
 #define DM  ((float) (1.0/(100-1.0)))
 
@@ -88,12 +92,20 @@ void display_selected_quad(Polyhedron* poly);
 /*display vis results*/
 void display_polyhedron(Polyhedron* poly);
 
+
+typedef void function2d(double*, double*, double*, double*);
+void setVector(function2d equation, double* x, double* y, double* vx, double* vy)
+
+{
+	equation(x, y, vx, vy);
+}
+
 /*display utilities*/
 
 /*
 draw a sphere
 x, y, z are the coordiate of the dot
-radius of the sphere 
+radius of the sphere
 R: the red channel of the color, ranges [0, 1]
 G: the green channel of the color, ranges [0, 1]
 B: the blue channel of the color, ranges [0, 1]
@@ -163,7 +175,7 @@ G: the green channel of the color, ranges [0, 1]
 B: the blue channel of the color, ranges [0, 1]
 */
 void drawPolyline(PolyLine pl, double width = 1.0, double R = 1.0, double G = 0.0, double B = 0.0) {
-	
+
 	glDisable(GL_LIGHTING);
 	glEnable(GL_LINE_SMOOTH);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -184,6 +196,9 @@ void drawPolyline(PolyLine pl, double width = 1.0, double R = 1.0, double G = 0.
 	glDisable(GL_BLEND);
 }
 
+
+
+
 /******************************************************************************
 Main program.
 ******************************************************************************/
@@ -195,11 +210,11 @@ int main(int argc, char* argv[])
 
 	poly = new Polyhedron(this_file);
 	fclose(this_file);
-	
+
 	/*initialize the mesh*/
 	poly->initialize(); // initialize the mesh
 	poly->write_info();
-
+	poly->setMinMax();
 
 	/*init glut and create window*/
 	glutInit(&argc, argv);
@@ -214,7 +229,7 @@ int main(int argc, char* argv[])
 
 	/*prepare the noise texture for IBFV*/
 	makePatterns();
-	
+
 	/*the render function and callback registration*/
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);
@@ -223,10 +238,10 @@ int main(int argc, char* argv[])
 	glutMotionFunc(motion);
 	glutMouseFunc(mouse);
 	glutMouseWheelFunc(mousewheel);
-	
+
 	/*event processing loop*/
 	glutMainLoop();
-	
+
 	/*clear memory before exit*/
 	poly->finalize();	// finalize everything
 	free(pixels);
@@ -265,13 +280,13 @@ void set_view(GLenum mode)
 		if (view_mode == 0)
 			glOrtho(-radius_factor * zoom * aspectRatio, radius_factor * zoom * aspectRatio, -radius_factor * zoom, radius_factor * zoom, -1000, 1000);
 		else
-			glFrustum(-radius_factor * zoom * aspectRatio, radius_factor * zoom * aspectRatio, -radius_factor* zoom, radius_factor* zoom, 0.1, 1000);
+			glFrustum(-radius_factor * zoom * aspectRatio, radius_factor * zoom * aspectRatio, -radius_factor * zoom, radius_factor * zoom, 0.1, 1000);
 	}
 	else {
 		if (view_mode == 0)
 			glOrtho(-radius_factor * zoom, radius_factor * zoom, -radius_factor * zoom / aspectRatio, radius_factor * zoom / aspectRatio, -1000, 1000);
 		else
-			glFrustum(-radius_factor * zoom, radius_factor * zoom, -radius_factor* zoom / aspectRatio, radius_factor* zoom / aspectRatio, 0.1, 1000);
+			glFrustum(-radius_factor * zoom, radius_factor * zoom, -radius_factor * zoom / aspectRatio, radius_factor * zoom / aspectRatio, 0.1, 1000);
 	}
 
 
@@ -330,10 +345,10 @@ void init(void) {
 	glDisable(GL_DITHER);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	
+
 	//set pixel storage modes
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	
+
 	glEnable(GL_NORMALIZE);
 	if (poly->orientation == 0)
 		glFrontFace(GL_CW);
@@ -414,7 +429,7 @@ void display_quads(GLenum mode, Polyhedron* this_poly)
 			mat_diffuse[3] = 1.0;
 		}
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-		
+
 		glBegin(GL_POLYGON);
 		for (j = 0; j < 4; j++) {
 			Vertex* temp_v = temp_q->verts[j];
@@ -526,8 +541,8 @@ void reshape(int width, int height) {
 
 	/*Update pixels buffer*/
 	free(pixels);
-	pixels = (unsigned char *)malloc(sizeof(unsigned char)*win_width*win_height * 3);
-	memset(pixels, 255, sizeof(unsigned char)*win_width*win_height * 3);
+	pixels = (unsigned char*)malloc(sizeof(unsigned char) * win_width * win_height * 3);
+	memset(pixels, 255, sizeof(unsigned char) * win_width * win_height * 3);
 }
 
 
@@ -583,7 +598,7 @@ void mouse(int button, int state, int x, int y) {
 	int key = glutGetModifiers();
 
 	if (button == GLUT_LEFT_BUTTON || button == GLUT_RIGHT_BUTTON) {
-		
+
 		if (state == GLUT_DOWN) {
 			float xsize = (float)win_width;
 			float ysize = (float)win_height;
@@ -710,8 +725,8 @@ void mousewheel(int wheel, int direction, int x, int y) {
 /*Display IBFV*/
 void makePatterns(void)
 {
-	pixels = (unsigned char *)malloc(sizeof(unsigned char)*win_width*win_height * 3);
-	memset(pixels, 255, sizeof(unsigned char)*win_width*win_height * 3);
+	pixels = (unsigned char*)malloc(sizeof(unsigned char) * win_width * win_height * 3);
+	memset(pixels, 255, sizeof(unsigned char) * win_width * win_height * 3);
 
 	int lut[256];
 	int phase[NPN][NPN];
@@ -738,9 +753,22 @@ void makePatterns(void)
 
 }
 
+
+/*Equations to create time-dependent variables*/
+void testEqu1(double* x, double* y, double* vx, double* vy) {
+	*vx = sin(iframe);
+	*vy = 1;
+}
+void testEqu2(double* x, double* y, double* vx, double* vy) {
+	*vx = cos(*y + iframe);
+	*vy = sin(*x - 0.5 * iframe);
+}
+
+/*Displays IBFV of vector flow*/
 void displayIBFV(void)
 {
-	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHTING)
+		;
 	glDisable(GL_LIGHT0);
 	glDisable(GL_LIGHT1);
 	glDisable(GL_POLYGON_OFFSET_FILL);
@@ -781,12 +809,243 @@ void displayIBFV(void)
 			double y = temp_v->y;
 
 			double tx, ty, dummy;
-
 			gluProject((GLdouble)temp_v->x, (GLdouble)temp_v->y, (GLdouble)temp_v->z,
 				modelview_matrix1, projection_matrix1, viewport1, &tx, &ty, &dummy);
 
 			tx = tx / win_width;
 			ty = ty / win_height;
+			//temp_v->vx = cos(temp_v->y+iframe);
+			//temp_v->vy = sin(temp_v->x-0.5*iframe);
+
+			//temp_v->vx = 0.5*temp_v->x;
+			//temp_v->vy = cos(1.2*temp_v->x-iframe);
+
+			//temp_v->vx = sin(iframe);
+			//temp_v->vy = 1;
+			setVector(testEqu2, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
+			//(temp_v->vx, temp_v->vy);
+			icVector2 dp = icVector2(temp_v->vx, temp_v->vy);
+			normalize(dp);
+
+			double dx = dp.x;
+			double dy = dp.y;
+
+			double r = dx * dx + dy * dy;
+			if (r > dmax * dmax) {
+				r = sqrt(r);
+				dx *= dmax / r;
+				dy *= dmax / r;
+			}
+
+			float px = tx + dx;
+			float py = ty + dy;
+
+			glTexCoord2f(px, py);
+			glVertex3d(temp_v->x, temp_v->y, temp_v->z);
+		}
+		glEnd();
+	}
+
+	iframe = iframe + 1;
+
+	glEnable(GL_BLEND);
+
+	/*blend the drawing with another noise image*/
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glTranslatef(-1.0, -1.0, 0.0);
+	glScalef(2.0, 2.0, 1.0);
+
+	glCallList(iframe % Npat + 1);
+
+	glBegin(GL_QUAD_STRIP);
+
+	glTexCoord2f(0.0, 0.0);  glVertex2f(0.0, 0.0);
+	glTexCoord2f(0.0, tmax); glVertex2f(0.0, 1.0);
+	glTexCoord2f(tmax, 0.0);  glVertex2f(1.0, 0.0);
+	glTexCoord2f(tmax, tmax); glVertex2f(1.0, 1.0);
+	glEnd();
+	glDisable(GL_BLEND);
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+	glReadPixels(0, 0, win_width, win_height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	/*draw the model with using pixels, note the tx and ty do not take the vector on points*/
+	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	for (int i = 0; i < poly->nquads; i++) { //go through all the quads
+		Quad* temp_q = poly->qlist[i];
+		glBegin(GL_QUADS);
+		for (int j = 0; j < 4; j++) {
+			Vertex* temp_v = temp_q->verts[j];
+			double x = temp_v->x;
+			double y = temp_v->y;
+			double tx, ty, dummy;
+			gluProject((GLdouble)temp_v->x, (GLdouble)temp_v->y, (GLdouble)temp_v->z,
+				modelview_matrix1, projection_matrix1, viewport1, &tx, &ty, &dummy);
+			tx = tx / win_width;
+			ty = ty / win_height;
+			glTexCoord2f(tx, ty);
+			glVertex3d(temp_v->x, temp_v->y, temp_v->z);
+		}
+		glEnd();
+	}
+
+	glDisable(GL_TEXTURE_2D);
+	glShadeModel(GL_SMOOTH);
+	glDisable(GL_BLEND);
+}
+/******************************************************************************
+Callback function for scene display
+******************************************************************************/
+std::vector<std::pair<PolyLine, float>> contours;
+
+void display(void)
+{
+	if (setInterval)
+		Sleep(100);
+	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	set_view(GL_RENDER);
+	CHECK_GL_ERROR();
+
+	set_scene(GL_RENDER, poly);
+	CHECK_GL_ERROR();
+
+	/*display the mesh*/
+	display_polyhedron(poly);
+	CHECK_GL_ERROR();
+
+	/*display selected elements*/
+	display_selected_vertex(poly);
+	CHECK_GL_ERROR();
+
+	display_selected_quad(poly);
+	CHECK_GL_ERROR();
+
+	glFlush();
+	glutSwapBuffers();
+	glFinish();
+
+	CHECK_GL_ERROR();
+}
+
+void keyboard(unsigned char key, int x, int y) {
+	int i;
+
+	/* set escape key to exit */
+	switch (key) {
+	case 27: {
+		poly->finalize();  // finalize_everything
+		exit(0);
+		break;
+	}
+	case '1': {
+		display_mode = 1;
+		break;
+	}
+	case '2': {
+		//steady field
+		display_mode = 2;
+		break;
+	}
+	case '3': {
+		//Ambient Motion
+		display_mode = 3;
+	}
+
+	case 'c': {
+		showCoordinate = !showCoordinate;
+		break;
+	}
+	case 's': {
+		setInterval = !setInterval;
+		break;
+	}
+	case 'd': {
+		showDotsAndArrows = !showDotsAndArrows;
+		break;
+	}
+	case 'r': {
+		mat_ident(rotmat);
+		translation[0] = 0;
+		translation[1] = 0;
+		zoom = 1.0;
+		glutPostRedisplay();
+		break;
+	}
+	}
+}
+
+/*******************************************************************************
+Calculate and display unsteady vector flow
+********************************************************************************/
+
+void displayUnsteadyUBFV() {
+	glDisable(GL_LIGHTING)
+		;
+	glDisable(GL_LIGHT0);
+	glDisable(GL_LIGHT1);
+	glDisable(GL_POLYGON_OFFSET_FILL);
+	glDisable(GL_DEPTH_TEST);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+	glEnable(GL_TEXTURE_2D);
+	glShadeModel(GL_FLAT);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	/*draw the model with using the pixels, using vector field to advert the texture coordinates*/
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	double modelview_matrix1[16], projection_matrix1[16];
+	int viewport1[4];
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview_matrix1);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection_matrix1);
+	glGetIntegerv(GL_VIEWPORT, viewport1);
+
+	for (int i = 0; i < poly->nquads; i++) { //go through all the quads
+
+		Quad* temp_q = poly->qlist[i];
+
+		glBegin(GL_QUADS);
+
+		for (int j = 0; j < 4; j++) {
+			Vertex* temp_v = temp_q->verts[j];
+
+			double x = temp_v->x;
+			double y = temp_v->y;
+
+			double tx, ty, dummy;
+			gluProject((GLdouble)temp_v->x, (GLdouble)temp_v->y, (GLdouble)temp_v->z,
+				modelview_matrix1, projection_matrix1, viewport1, &tx, &ty, &dummy);
+
+			tx = tx / win_width;
+			ty = ty / win_height;
+
+			setVector(testEqu2, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
 
 			icVector2 dp = icVector2(temp_v->vx, temp_v->vy);
 			normalize(dp);
@@ -873,73 +1132,333 @@ void displayIBFV(void)
 	glDisable(GL_BLEND);
 }
 
-/******************************************************************************
-Process a keyboard action.  In particular, exit the program when an
-"escape" is pressed in the window.
-******************************************************************************/
-
-void keyboard(unsigned char key, int x, int y) {
-	int i;
-
-	/* set escape key to exit */
-	switch (key) {
-	case '1':
-		display_mode = 1;
-		glutPostRedisplay();
-		break;
-
-	case '2':
-		display_mode = 2;
-		glutPostRedisplay();
-		break;
-	
-
-	case '3':
-		display_mode = 2;
-		glutPostRedisplay();
-		break;
-	}
-}
-
-/******************************************************************************
-Callback function for scene display
-******************************************************************************/
-std::vector<std::pair<PolyLine, float>> contours;
-
-void display(void)
+/*******************************************************************************
+Calculate and display steady vector flow
+********************************************************************************/
+void displaySteadyUBFV(void)
 {
-	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
+	glDisable(GL_LIGHTING)
+		;
+	glDisable(GL_LIGHT0);
+	glDisable(GL_LIGHT1);
+	glDisable(GL_POLYGON_OFFSET_FILL);
+	glDisable(GL_DEPTH_TEST);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+	glEnable(GL_TEXTURE_2D);
+	glShadeModel(GL_FLAT);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	set_view(GL_RENDER);
-	CHECK_GL_ERROR();
+	/*draw the model with using the pixels, using vector field to advert the texture coordinates*/
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
-	set_scene(GL_RENDER, poly);
-	CHECK_GL_ERROR();
+	double modelview_matrix1[16], projection_matrix1[16];
+	int viewport1[4];
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview_matrix1);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection_matrix1);
+	glGetIntegerv(GL_VIEWPORT, viewport1);
 
-	/*display the mesh*/
-	display_polyhedron(poly);
-	CHECK_GL_ERROR();
+	for (int i = 0; i < poly->nquads; i++) { //go through all the quads
 
-	/*display selected elements*/
-	display_selected_vertex(poly);
-	CHECK_GL_ERROR();
+		Quad* temp_q = poly->qlist[i];
 
-	display_selected_quad(poly);
-	CHECK_GL_ERROR();
+		glBegin(GL_QUADS);
 
-	glFlush();
-	glutSwapBuffers();
-	glFinish();
+		for (int j = 0; j < 4; j++) {
+			Vertex* temp_v = temp_q->verts[j];
 
-	CHECK_GL_ERROR();
+			double x = temp_v->x;
+			double y = temp_v->y;
+
+			double tx, ty, dummy;
+			gluProject((GLdouble)temp_v->x, (GLdouble)temp_v->y, (GLdouble)temp_v->z,
+				modelview_matrix1, projection_matrix1, viewport1, &tx, &ty, &dummy);
+
+			tx = tx / win_width;
+			ty = ty / win_height;
+
+			setVector(testEqu2, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy); // Switch to calling steady vector field
+
+			icVector2 dp = icVector2(temp_v->vx, temp_v->vy);
+			normalize(dp);
+
+			double dx = dp.x;
+			double dy = dp.y;
+
+			double r = dx * dx + dy * dy;
+			if (r > dmax * dmax) {
+				r = sqrt(r);
+				dx *= dmax / r;
+				dy *= dmax / r;
+			}
+
+			float px = tx + dx;
+			float py = ty + dy;
+
+			glTexCoord2f(px, py);
+			glVertex3d(temp_v->x, temp_v->y, temp_v->z);
+		}
+		glEnd();
+	}
+
+	iframe = iframe + 1;
+
+	glEnable(GL_BLEND);
+
+	/*blend the drawing with another noise image*/
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glTranslatef(-1.0, -1.0, 0.0);
+	glScalef(2.0, 2.0, 1.0);
+
+	glCallList(iframe % Npat + 1);
+
+	glBegin(GL_QUAD_STRIP);
+
+	glTexCoord2f(0.0, 0.0);  glVertex2f(0.0, 0.0);
+	glTexCoord2f(0.0, tmax); glVertex2f(0.0, 1.0);
+	glTexCoord2f(tmax, 0.0);  glVertex2f(1.0, 0.0);
+	glTexCoord2f(tmax, tmax); glVertex2f(1.0, 1.0);
+	glEnd();
+	glDisable(GL_BLEND);
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+	glReadPixels(0, 0, win_width, win_height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	/*draw the model with using pixels, note the tx and ty do not take the vector on points*/
+	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	for (int i = 0; i < poly->nquads; i++) { //go through all the quads
+		Quad* temp_q = poly->qlist[i];
+		glBegin(GL_QUADS);
+		for (int j = 0; j < 4; j++) {
+			Vertex* temp_v = temp_q->verts[j];
+			double x = temp_v->x;
+			double y = temp_v->y;
+			double tx, ty, dummy;
+			gluProject((GLdouble)temp_v->x, (GLdouble)temp_v->y, (GLdouble)temp_v->z,
+				modelview_matrix1, projection_matrix1, viewport1, &tx, &ty, &dummy);
+			tx = tx / win_width;
+			ty = ty / win_height;
+			glTexCoord2f(tx, ty);
+			glVertex3d(temp_v->x, temp_v->y, temp_v->z);
+		}
+		glEnd();
+	}
+
+	glDisable(GL_TEXTURE_2D);
+	glShadeModel(GL_SMOOTH);
+	glDisable(GL_BLEND);
+}
+
+/*******************************************************************************
+Calculate and display ambient motion vector flow
+********************************************************************************/
+void displayAmbientUBFV() {
+	glDisable(GL_LIGHTING)
+		;
+	glDisable(GL_LIGHT0);
+	glDisable(GL_LIGHT1);
+	glDisable(GL_POLYGON_OFFSET_FILL);
+	glDisable(GL_DEPTH_TEST);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+	glEnable(GL_TEXTURE_2D);
+	glShadeModel(GL_FLAT);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	/*draw the model with using the pixels, using vector field to advert the texture coordinates*/
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	double modelview_matrix1[16], projection_matrix1[16];
+	int viewport1[4];
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview_matrix1);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection_matrix1);
+	glGetIntegerv(GL_VIEWPORT, viewport1);
+
+	for (int i = 0; i < poly->nquads; i++) { //go through all the quads
+
+		Quad* temp_q = poly->qlist[i];
+
+		glBegin(GL_QUADS);
+
+		for (int j = 0; j < 4; j++) {
+			Vertex* temp_v = temp_q->verts[j];
+
+			double x = temp_v->x;
+			double y = temp_v->y;
+
+			double tx, ty, dummy;
+			gluProject((GLdouble)temp_v->x, (GLdouble)temp_v->y, (GLdouble)temp_v->z,
+				modelview_matrix1, projection_matrix1, viewport1, &tx, &ty, &dummy);
+
+			tx = tx / win_width;
+			ty = ty / win_height;
+
+			setVector(testEqu2, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
+
+			// Call steady vector
+			int newvx = (temp_v->x + temp_v->vx);
+			int newvy = (temp_v->y + temp_v->vy);
+			icVector2 dp = icVector2(temp_v->vx, temp_v->vy);
+			normalize(dp);
+
+			double dx = dp.x;
+			double dy = dp.y;
+
+			double r = dx * dx + dy * dy;
+			if (r > dmax * dmax) {
+				r = sqrt(r);
+				dx *= dmax / r;
+				dy *= dmax / r;
+			}
+
+			float px = tx + dx;
+			float py = ty + dy;
+
+			glTexCoord2f(px, py);
+			glVertex3d(temp_v->x, temp_v->y, temp_v->z);
+		}
+		glEnd();
+	}
+
+	iframe = iframe + 1;
+
+	glEnable(GL_BLEND);
+
+	/*blend the drawing with another noise image*/
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glTranslatef(-1.0, -1.0, 0.0);
+	glScalef(2.0, 2.0, 1.0);
+
+	glCallList(iframe % Npat + 1);
+
+	glBegin(GL_QUAD_STRIP);
+
+	glTexCoord2f(0.0, 0.0);  glVertex2f(0.0, 0.0);
+	glTexCoord2f(0.0, tmax); glVertex2f(0.0, 1.0);
+	glTexCoord2f(tmax, 0.0);  glVertex2f(1.0, 0.0);
+	glTexCoord2f(tmax, tmax); glVertex2f(1.0, 1.0);
+	glEnd();
+	glDisable(GL_BLEND);
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+	glReadPixels(0, 0, win_width, win_height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	/*draw the model with using pixels, note the tx and ty do not take the vector on points*/
+	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	for (int i = 0; i < poly->nquads; i++) { //go through all the quads
+		Quad* temp_q = poly->qlist[i];
+		glBegin(GL_QUADS);
+		for (int j = 0; j < 4; j++) {
+			Vertex* temp_v = temp_q->verts[j];
+			double x = temp_v->x;
+			double y = temp_v->y;
+			double tx, ty, dummy;
+			gluProject((GLdouble)temp_v->x, (GLdouble)temp_v->y, (GLdouble)temp_v->z,
+				modelview_matrix1, projection_matrix1, viewport1, &tx, &ty, &dummy);
+			tx = tx / win_width;
+			ty = ty / win_height;
+			glTexCoord2f(tx, ty);
+			glVertex3d(temp_v->x, temp_v->y, temp_v->z);
+		}
+		glEnd();
+	}
+
+	glDisable(GL_TEXTURE_2D);
+	glShadeModel(GL_SMOOTH);
+	glDisable(GL_BLEND);
 }
 
 /******************************************************************************
 Diaplay the polygon with visualization results
 ******************************************************************************/
 
+void displayArrowUnsteady() {
+	for (int i = 0; i < poly->nverts; i++) {
+		Vertex* temp_v = poly->vlist[i];
+		setVector(testEqu2, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
+		drawDot(temp_v->x, temp_v->y, 0);
+		LineSegment line(temp_v->x, temp_v->y, 0, temp_v->vx * 0.7 + temp_v->x, temp_v->vy * 0.7 + temp_v->y, 0);
+		drawLineSegment(line);
+	}
+	iframe += 1;
+	if (iframe == INT_MAX)
+		iframe = 0;
+}
+
+void displayArrowSteady() {
+	for (int i = 0; i < poly->nverts; i++) {
+		Vertex* temp_v = poly->vlist[i];
+		setVector(testEqu2, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy); // Switch to calling steady vector
+		drawDot(temp_v->x, temp_v->y, 0);
+		LineSegment line(temp_v->x, temp_v->y, 0, temp_v->vx * 0.7 + temp_v->x, temp_v->vy * 0.7 + temp_v->y, 0);
+		drawLineSegment(line);
+	}
+	iframe += 1;
+	if (iframe == INT_MAX)
+		iframe = 0;
+}
+
+void displayArrowAmbient() {
+	for (int i = 0; i < poly->nverts; i++) {
+		Vertex* temp_v = poly->vlist[i];
+		setVector(testEqu2, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
+		//call steady vector
+		int newvx = (temp_v->x + temp_v->vx);
+		int newvy = (temp_v->y + temp_v->vy);
+		drawDot(temp_v->x, temp_v->y, 0);
+		LineSegment line(temp_v->x, temp_v->y, 0, newvx * 0.7 + temp_v->x, newvy * 0.7 + temp_v->y, 0);
+		drawLineSegment(line);
+	}
+	iframe += 1;
+	if (iframe == INT_MAX)
+		iframe = 0;
+}
 
 void display_polyhedron(Polyhedron* poly)
 {
@@ -950,27 +1469,27 @@ void display_polyhedron(Polyhedron* poly)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glShadeModel(GL_SMOOTH);
 	CHECK_GL_ERROR();
-
 	switch (display_mode) {
-	case 1: // Display unsteady vector flow
-	{
-		printf("1");
-		displayIBFV();
+	case 1: {
+		if (showDotsAndArrows)
+			displayArrowUnsteady();
+		else
+			displayUnsteadyUBFV();
 	}
-	break;
-
-	case 2: // Display steady vector flow
-	{
-		printf("2");
-		displayIBFV();
+		  break;
+	case 2: {
+		if (showDotsAndArrows)
+			displayArrowSteady();
+		else
+			displaySteadyUBFV();
 	}
-	break;
-
-	case 3: // Display ambient motion vector flow
-	{
-		printf("3");
-		displayIBFV();
+		  break;
+	case 3: {
+		if (showDotsAndArrows)
+			displayArrowAmbient();
+		else
+			displayAmbientUBFV();
 	}
-	break;
+		  break;
 	}
 }

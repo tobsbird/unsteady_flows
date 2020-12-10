@@ -1,63 +1,83 @@
 ﻿  learnply.cpp
 C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(30,28): warning C4305: 'initializing': truncation from 'double' to 'float'
 C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(35,19): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(61,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(62,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(115,20): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(116,20): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(117,20): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(126,21): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(126,18): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(126,15): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(147,14): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(150,18): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(150,15): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(150,12): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(151,45): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(151,33): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(151,21): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(152,39): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(152,29): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(152,19): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(172,14): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(175,18): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(175,15): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(175,12): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(177,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(178,55): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(178,40): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(178,25): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(179,49): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(179,36): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(179,23): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(194,20): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(243,50): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(244,50): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(285,26): warning C4305: '=': truncation from 'double' to 'GLfloat'
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(297,44): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(297,28): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(312,55): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(312,35): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(312,15): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(313,63): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(313,39): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(313,15): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(358,16): warning C4018: '<': signed/unsigned mismatch
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(405,16): warning C4018: '<': signed/unsigned mismatch
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(452,45): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(452,34): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(452,23): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(473,15): warning C4101: 'i': unreferenced local variable
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(474,10): warning C4101: 'mat_diffuse': unreferenced local variable
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(542,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(543,44): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(591,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(592,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(804,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(805,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(865,21): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(865,17): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(882,6): warning C4101: 'i': unreferenced local variable
-learnply.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
-  learnply.vcxproj -> C:\Users\tobst\cmder\unsteady_flows\learnply\..\Debug\learnply.exe
-  0 File(s) copied
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(65,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(66,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(127,20): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(128,20): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(129,20): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(138,21): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(138,18): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(138,15): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(159,14): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(162,18): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(162,15): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(162,12): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(163,45): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(163,33): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(163,21): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(164,39): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(164,29): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(164,19): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(184,14): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(187,18): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(187,15): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(187,12): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(189,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(190,55): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(190,40): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(190,25): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(191,49): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(191,36): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(191,23): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(217,8): error C2039: 'setMinMax': is not a member of 'Polyhedron'
+C:\Users\tobst\cmder\unsteady_flows\learnply\polyhedron.h(79): message : see declaration of 'Polyhedron'
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(209,20): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(258,50): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(259,50): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(300,26): warning C4305: '=': truncation from 'double' to 'GLfloat'
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(312,44): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(312,28): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(327,55): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(327,35): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(327,15): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(328,63): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(328,39): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(328,15): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(373,16): warning C4018: '<': signed/unsigned mismatch
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(420,16): warning C4018: '<': signed/unsigned mismatch
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(467,45): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(467,34): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(467,23): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(557,28): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(558,44): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(606,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(607,12): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(840,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(841,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(901,21): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(901,17): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1063,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1064,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1124,21): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1124,17): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1203,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1204,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1264,21): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1264,17): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1330,14): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1331,14): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1345,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1346,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1406,21): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1406,17): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1452,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\learnply.cpp(1453,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  polyhedron.cpp
+C:\Users\tobst\cmder\unsteady_flows\learnply\polyhedron.cpp(185,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\tobst\cmder\unsteady_flows\learnply\polyhedron.cpp(766,16): warning C4018: '<': signed/unsigned mismatch
+C:\Users\tobst\cmder\unsteady_flows\learnply\polyhedron.cpp(810,16): warning C4018: '<': signed/unsigned mismatch
+C:\Users\tobst\cmder\unsteady_flows\learnply\polyhedron.cpp(821,111): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\tobst\cmder\unsteady_flows\learnply\polyhedron.cpp(835,16): warning C4018: '<': signed/unsigned mismatch
+C:\Users\tobst\cmder\unsteady_flows\learnply\polyhedron.cpp(844,17): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
