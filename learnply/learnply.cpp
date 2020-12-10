@@ -30,8 +30,8 @@ std::vector<PolyLine> streamlines;
 const float zoomspeed = 0.9;
 const int view_mode = 0;		// 0 = othogonal, 1=perspective
 const double radius_factor = 1.0;
-int win_width = 800;
-int win_height = 800;
+int win_width = 1000;
+int win_height = 1000;
 float aspectRatio = win_width / win_height;
 /*
 Use keys 1 to 0 to switch among different display modes.
@@ -44,6 +44,10 @@ display mode 2: show wireframes
 display mode 3: render each quad with colors of vertices
 */
 int display_mode = 1;
+
+int showCoordinate = 1;
+int setInterval = 1;
+int showDotsAndArrows = 1;
 
 /*User Interaction related variabes*/
 float s_old, t_old;
@@ -72,6 +76,7 @@ void init(void);
 void makePatterns(void);
 
 /*glut attaching functions*/
+void keyboard(unsigned char key, int x, int y);
 void motion(int x, int y);
 void display(void);
 void mouse(int button, int state, int x, int y);
@@ -86,6 +91,15 @@ void display_selected_quad(Polyhedron* poly);
 
 /*display vis results*/
 void display_polyhedron(Polyhedron* poly);
+
+
+
+typedef void function2d (double*, double*, double*, double*);
+void setVector(function2d equation, double *x, double *y, double*vx, double*vy)
+
+{
+	equation(x,y,vx,vy);
+}
 
 /*display utilities*/
 
@@ -218,6 +232,7 @@ int main(int argc, char* argv[])
 	makePatterns();
 	
 	/*the render function and callback registration*/
+	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 	glutIdleFunc(display);
@@ -739,6 +754,14 @@ void makePatterns(void)
 
 }
 
+void testEqu1(double* x, double* y, double* vx, double* vy) {
+	*vx = sin(iframe);
+	*vy = 1;
+}
+void testEqu2(double* x, double* y, double* vx, double* vy) {
+	*vx = cos(*y+iframe);
+	*vy = sin(*x-0.5*iframe);
+}
 void displayIBFV(void)
 {
 	glDisable(GL_LIGHTING);
@@ -793,8 +816,10 @@ void displayIBFV(void)
 			//temp_v->vx = 0.5*temp_v->x;
 			//temp_v->vy = cos(1.2*temp_v->x-iframe);
 
-			temp_v->vx = sin(iframe);
-			temp_v->vy = 1;
+			//temp_v->vx = sin(iframe);
+			//temp_v->vy = 1;
+			setVector(testEqu1, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
+			//(temp_v->vx, temp_v->vy);
 			icVector2 dp = icVector2(temp_v->vx, temp_v->vy);
 			normalize(dp);
 
@@ -886,7 +911,8 @@ std::vector<std::pair<PolyLine, float>> contours;
 
 void display(void)
 {
-	Sleep(100);
+	if(setInterval)
+		Sleep(100);
 	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -915,14 +941,109 @@ void display(void)
 	CHECK_GL_ERROR();
 }
 
+void keyboard(unsigned char key, int x, int y) {
+	int i;
+
+	/* set escape key to exit */
+	switch (key) {
+		case 27: {
+			poly->finalize();  // finalize_everything
+			exit(0);
+			break;
+		}
+		case '1': {
+			display_mode = 1;
+			break;
+		}
+		case '2': {
+			//steady field
+			display_mode = 2;
+			break;
+		}
+		case '3': {
+			//Ambient Motion
+			display_mode = 3;
+		}
+
+		case 'c':{
+			showCoordinate = !showCoordinate;
+			break;
+		}
+		case 's': {
+			setInterval = !setInterval;
+			break;
+		}
+		case 'd': {
+			showDotsAndArrows = !showDotsAndArrows;
+			break;
+		}
+		case 'r':{
+			mat_ident(rotmat);
+			translation[0] = 0;
+			translation[1] = 0;
+			zoom = 1.0;
+			glutPostRedisplay();
+			break;
+		}
+	}
+}
+
 /******************************************************************************
 Diaplay the polygon with visualization results
 ******************************************************************************/
 
-void drawCordinate(Polyhedron* poly) {
-	drawLineSegment(LineSegment(icVector3(poly->minx, 0, 0), icVector3(poly->maxx, 0, 0)), 3);
-	drawLineSegment(LineSegment(icVector3(0, poly->miny, 0), icVector3(0, poly->maxy, 0)), 3);
+void drawLines(Polyhedron* poly, double width = 1.0, double R = 1.0, double G = 0.0, double B = 0.0) {
+
+	glDisable(GL_LIGHTING);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glLineWidth(width);
+
+	glBegin(GL_LINES);
+	glColor3f(R, G, B);
+	for (int i = 0; i < poly->nverts; i++) {
+		Vertex* temp_v = poly->vlist[i];
+		//temp_v->vx = cos(temp_v->y + iframe);
+		//temp_v->vy = sin(temp_v->x - 0.5 * iframe);
+		temp_v->vx = sin(iframe);
+		temp_v->vy = 1;
+		//printf("%f  %f\n", temp_v->vx, temp_v->vy);
+		glVertex3f(temp_v->x, temp_v->y, 0);
+		glVertex3f(temp_v->vx*0.7+ temp_v->x, temp_v->vy*0.7+temp_v->y, 0);
+	}
+	
+	glEnd();
+
+	glDisable(GL_BLEND);
 }
+
+void drawCordinate(Polyhedron* poly){ 
+	if (showCoordinate) {
+		drawLineSegment(LineSegment(icVector3(poly->minx, 0, 0), icVector3(poly->maxx, 0, 0)), 3);
+		drawLineSegment(LineSegment(icVector3(0, poly->miny, 0), icVector3(0, poly->maxy, 0)), 3);
+	}
+}
+
+void drawDotsAndArrows(Polyhedron* poly) {
+	if (showDotsAndArrows) {
+		for (int i = 0; i < poly->nverts; i++) {
+			Vertex* temp_v = poly->vlist[i];
+			drawDot(temp_v->x, temp_v->y, 0);
+
+			//setVector(testEqu1, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
+			//drawLineSegment(LineSegment(icVector3(temp_v->x, temp_v->y, 0), icVector3(temp_v->vx, temp_v->vy, 0)), 3);
+		}
+		drawLines(poly);
+		iframe += 1;
+		if (iframe == INT_MAX)
+			iframe = 0;
+		
+	}
+}
+
+
 
 
 void display_polyhedron(Polyhedron* poly)
@@ -934,8 +1055,13 @@ void display_polyhedron(Polyhedron* poly)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glShadeModel(GL_SMOOTH);
 	CHECK_GL_ERROR();
-	
-	displayIBFV();
+	switch (display_mode) {
+		case 1:{
+			//displayIBFV();
+			
+		}
+
+	}
 	drawCordinate(poly);
-	
+	drawDotsAndArrows(poly);
 }
