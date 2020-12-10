@@ -735,36 +735,7 @@ void mousewheel(int wheel, int direction, int x, int y) {
 	}
 }
 
-/*Display IBFV*/
-void makePatterns(void)
-{
-	pixels = (unsigned char *)malloc(sizeof(unsigned char)*win_width*win_height * 3);
-	memset(pixels, 255, sizeof(unsigned char)*win_width*win_height * 3);
 
-	int lut[256];
-	int phase[NPN][NPN];
-	GLubyte pat[NPN][NPN][4];
-	int i, j, k, t;
-
-	for (i = 0; i < 256; i++) lut[i] = i < 127 ? 0 : 255;
-	for (i = 0; i < NPN; i++)
-		for (j = 0; j < NPN; j++) phase[i][j] = rand() % 256;
-
-	for (k = 0; k < Npat; k++) {
-		t = k * 256 / Npat;
-		for (i = 0; i < NPN; i++)
-			for (j = 0; j < NPN; j++) {
-				pat[i][j][0] =
-					pat[i][j][1] =
-					pat[i][j][2] = lut[(t + phase[i][j]) % 255];
-				pat[i][j][3] = int(0.12 * 255);
-			}
-		glNewList(k + 1, GL_COMPILE);
-		glTexImage2D(GL_TEXTURE_2D, 0, 4, NPN, NPN, 0, GL_RGBA, GL_UNSIGNED_BYTE, pat);
-		glEndList();
-	}
-
-}
 
 void testEqu1(double* x, double* y, double* vx, double* vy) {
 	*vx = sin(iframe);
@@ -779,148 +750,7 @@ void testEqu3(double* x, double* y, double* vx, double* vy) {
 	*vx = 1.5 * (*x);
 	*vy = *y*cos(*x-0.5 *iframe);
 }
-void displayIBFV(void)
-{
-	glDisable(GL_LIGHTING);
-	glDisable(GL_LIGHT0);
-	glDisable(GL_LIGHT1);
-	glDisable(GL_POLYGON_OFFSET_FILL);
-	glDisable(GL_DEPTH_TEST);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-	glEnable(GL_TEXTURE_2D);
-	glShadeModel(GL_FLAT);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	/*draw the model with using the pixels, using vector field to advert the texture coordinates*/
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-	double modelview_matrix1[16], projection_matrix1[16];
-	int viewport1[4];
-	glGetDoublev(GL_MODELVIEW_MATRIX, modelview_matrix1);
-	glGetDoublev(GL_PROJECTION_MATRIX, projection_matrix1);
-	glGetIntegerv(GL_VIEWPORT, viewport1);
-
-	for (int i = 0; i < poly->nquads; i++) { //go through all the quads
-
-		Quad* temp_q = poly->qlist[i];
-
-		glBegin(GL_QUADS);
-
-		for (int j = 0; j < 4; j++) {
-			Vertex* temp_v = temp_q->verts[j];
-
-			double x = temp_v->x;
-			double y = temp_v->y;
-
-			double tx, ty, dummy;
-			gluProject((GLdouble)temp_v->x, (GLdouble)temp_v->y, (GLdouble)temp_v->z,
-				modelview_matrix1, projection_matrix1, viewport1, &tx, &ty, &dummy);
-
-			tx = tx / win_width;
-			ty = ty / win_height;
-			//temp_v->vx = cos(temp_v->y+iframe);
-			//temp_v->vy = sin(temp_v->x-0.5*iframe);
-
-			//temp_v->vx = 0.5*temp_v->x;
-			//temp_v->vy = cos(1.2*temp_v->x-iframe);
-
-			//temp_v->vx = sin(iframe);
-			//temp_v->vy = 1;
-			setVector(testEqu1, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
-			//(temp_v->vx, temp_v->vy);
-			icVector2 dp = icVector2(temp_v->vx, temp_v->vy);
-			normalize(dp);
-
-			double dx = dp.x;
-			double dy = dp.y;
-
-			double r = dx * dx + dy * dy;
-			if (r > dmax * dmax) {
-				r = sqrt(r);
-				dx *= dmax / r;
-				dy *= dmax / r;
-			}
-
-			float px = tx + dx;
-			float py = ty + dy;
-
-			glTexCoord2f(px, py);
-			glVertex3d(temp_v->x, temp_v->y, temp_v->z);
-		}
-		glEnd();
-	}
-
-	iframe = iframe + 1;
-
-	glEnable(GL_BLEND);
-
-	/*blend the drawing with another noise image*/
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	glTranslatef(-1.0, -1.0, 0.0);
-	glScalef(2.0, 2.0, 1.0);
-
-	glCallList(iframe % Npat + 1);
-
-	glBegin(GL_QUAD_STRIP);
-
-	glTexCoord2f(0.0, 0.0);  glVertex2f(0.0, 0.0);
-	glTexCoord2f(0.0, tmax); glVertex2f(0.0, 1.0);
-	glTexCoord2f(tmax, 0.0);  glVertex2f(1.0, 0.0);
-	glTexCoord2f(tmax, tmax); glVertex2f(1.0, 1.0);
-	glEnd();
-	glDisable(GL_BLEND);
-
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-
-	glReadPixels(0, 0, win_width, win_height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-	/*draw the model with using pixels, note the tx and ty do not take the vector on points*/
-	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-	for (int i = 0; i < poly->nquads; i++) { //go through all the quads
-		Quad* temp_q = poly->qlist[i];
-		glBegin(GL_QUADS);
-		for (int j = 0; j < 4; j++) {
-			Vertex* temp_v = temp_q->verts[j];
-			double x = temp_v->x;
-			double y = temp_v->y;
-			double tx, ty, dummy;
-			gluProject((GLdouble)temp_v->x, (GLdouble)temp_v->y, (GLdouble)temp_v->z,
-				modelview_matrix1, projection_matrix1, viewport1, &tx, &ty, &dummy);
-			tx = tx / win_width;
-			ty = ty / win_height;
-			glTexCoord2f(tx, ty);
-			glVertex3d(temp_v->x, temp_v->y, temp_v->z);
-		}
-		glEnd();
-	}
-
-	glDisable(GL_TEXTURE_2D);
-	glShadeModel(GL_SMOOTH);
-	glDisable(GL_BLEND);
-}
 /******************************************************************************
 Callback function for scene display
 ******************************************************************************/
@@ -1131,10 +961,6 @@ void drawDotsInField(Polyhedron* poly, double radius = 0.1, double R = 1.0, doub
 	glPointSize(5.0f);
 	for (int i = 0; i < poly->nverts; i++) {
 		Vertex* temp_v = poly->vlist[i];
-		//glPushMatrix();
-		//glTranslatef(temp_v->x, temp_v->y, 0.0);
-		//gluSphere(quad, radius, 50, 50);
-		//glPopMatrix();
 		glBegin(GL_POINTS);
 		glColor3f(1.0f, 0.0f, 0.0f);
 		
@@ -1159,7 +985,10 @@ void drawDots(Polyhedron* poly) {
 }
 
 
+void convertToSteadyVec2d(int i, int j, Vertex& v, Vertex& J, Vertex& f, Vertex& g) {
+	double x = v.x, y = v.y, vx = v.vx, vy = v.vy;
 
+}
 
 void display_polyhedron(Polyhedron* poly)
 {
@@ -1180,12 +1009,10 @@ void display_polyhedron(Polyhedron* poly)
 			
 		}
 		case 2: {
-			//displayIBFV();
 			drawUnsteady(poly);
 			break;
 		}
 		case 3: {
-			//displayIBFV();
 			drawUnsteady(poly);
 			break;
 		}
