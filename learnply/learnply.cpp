@@ -73,7 +73,7 @@ Forward declaration of functions
 ******************************************************************************/
 
 void init(void);
-void makePatterns(void);
+
 
 /*glut attaching functions*/
 void keyboard(unsigned char key, int x, int y);
@@ -238,7 +238,6 @@ int main(int argc, char* argv[])
 	init();
 
 	/*prepare the noise texture for IBFV*/
-	makePatterns();
 	
 	/*the render function and callback registration*/
 	glutKeyboardFunc(keyboard);
@@ -799,16 +798,19 @@ void keyboard(unsigned char key, int x, int y) {
 		}
 		case '1': {
 			display_mode = 1;
+			iframe = 0;
 			break;
 		}
 		case '2': {
 			//steady field
 			display_mode = 2;
+			iframe = 0;
 			break;
 		}
 		case '3': {
 			//Ambient Motion
 			display_mode = 3;
+			iframe = 0;
 		}
 
 		case 'c':{
@@ -829,6 +831,7 @@ void keyboard(unsigned char key, int x, int y) {
 			translation[1] = 0;
 			zoom = 1.0;
 			glutPostRedisplay();
+			iframe = 0;
 			break;
 		}
 	}
@@ -983,11 +986,83 @@ void drawDots(Polyhedron* poly) {
 		drawDotsInField(poly);
 	}
 }
+int factorial(int n)
+{
+	int ret = 1;
+	for (int i = 1; i <= n; ++i)
+		ret *= i;
+	return ret;
+}
 
-
-void convertToSteadyVec2d(int i, int j, Vertex& v, Vertex& J, Vertex& f, Vertex& g) {
+void convertToSteadyVec2d(Vertex& v, double J[2][2] , double f[2][2], double g[2][2]) {
 	double x = v.x, y = v.y, vx = v.vx, vy = v.vy;
+	int TaylorOrder = 2;
+	for (int m = 0; m <= TaylorOrder; ++m)
+	{
+		for (int i = m; i >= 0; --i)
+		{
+			int j = m - i;
+			
+			double I[2][2] = { {1,0},{0,1} };
 
+			double x_i = pow(x, i), x_i1 = pow(x, i - 1);
+			double y_j = pow(y, j), y_j1 = pow(y, j - 1);
+
+			int fac_i = factorial(i), fac_i1 = factorial(i - 1);
+			int fac_j = factorial(j), fac_j1 = factorial(j - 1);
+
+			f[0][0] -= x_i * y_j / (fac_i * fac_j) * J[0][0];
+			f[0][1] -= x_i * y_j / (fac_i * fac_j) * J[0][1];
+			f[1][0] -= x_i * y_j / (fac_i * fac_j) * J[1][0];
+			f[1][1] -= x_i * y_j / (fac_i * fac_j) * J[1][1];
+			if (i != 0) {
+				f[0][0] += vx * x_i1 * y_j / (fac_i1 * fac_j) * I[0][0];
+				f[0][1] += vx * x_i1 * y_j / (fac_i1 * fac_j) * I[0][1];
+				f[1][0] += vx * x_i1 * y_j / (fac_i1 * fac_j) * I[1][0];
+				f[1][1] += vx * x_i1 * y_j / (fac_i1 * fac_j) * I[1][1];
+			}
+
+			if (j != 0) {
+				f[0][0] += vy * x_i * y_j1 / (fac_i * fac_j1) * I[0][0];
+				f[0][1] += vy * x_i * y_j1 / (fac_i * fac_j1) * I[0][1];
+				f[1][0] += vy * x_i * y_j1 / (fac_i * fac_j1) * I[1][0];
+				f[1][1] += vy * x_i * y_j1 / (fac_i * fac_j1) * I[1][1];
+			}
+			g[0][0] = x_i * y_j / (fac_i * fac_j) * I[0][0];
+			g[0][1] = x_i * y_j / (fac_i * fac_j) * I[0][1];
+			g[1][0] = x_i * y_j / (fac_i * fac_j) * I[1][0];
+			g[1][1] = x_i * y_j / (fac_i * fac_j) * I[1][1];
+		}
+	}
+}
+
+
+void drawSteady(Polyhedron* poly, double width = 1.0, double R = 1.0, double G = 0.0, double B = 0.0) {
+	glDisable(GL_LIGHTING);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glLineWidth(width);
+
+	glBegin(GL_LINES);
+	glColor3f(R, G, B);
+	for (int i = 0; i < poly->nverts; i++) {
+		double f[2][2] = { {0,0},{0,0} };
+		double g[2][2] = { {0,0},{0,0} };
+		Vertex* temp_v = poly->vlist[i];
+		setVector(testEqu1, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
+		double J[2][2] = { {0, 1} ,{0,1} };
+		convertToSteadyVec2d(*temp_v, J, f, g);
+		//printf("temp: %f  %f  %f  %f\n", temp_v->x, temp_v->y, temp_v->vx, temp_v->vy);
+		//printf("f:    %f  %f  %f  %f\n", f[0][0], f[0][1], f[1][0], f[1][1]);
+		glVertex3f(temp_v->x, temp_v->y, 0);
+		glVertex3f(f[0][1]-f[0][0] + temp_v->x, f[1][1]-f[1][0] + temp_v->y, 0);
+	}
+	iframe += 1;
+	glEnd();
+
+	glDisable(GL_BLEND);
 }
 
 void display_polyhedron(Polyhedron* poly)
@@ -1009,7 +1084,7 @@ void display_polyhedron(Polyhedron* poly)
 			
 		}
 		case 2: {
-			drawUnsteady(poly);
+			drawSteady(poly);
 			break;
 		}
 		case 3: {
