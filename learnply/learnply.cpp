@@ -47,12 +47,12 @@ int display_mode = 1;
 
 int showCoordinate = 1;
 int setInterval = 1;
-int showDotsAndArrows = 1;
+int ShowDots = 1;
 
 /*User Interaction related variabes*/
 float s_old, t_old;
 float rotmat[4][4];
-double zoom = 1.0;
+double zoom = 0.8;
 double translation[2] = { 0, 0 };
 int mouse_mode = -2;	// -1 = no action, 1 = tranlate y, 2 = rotate
 
@@ -100,6 +100,8 @@ void setVector(function2d equation, double *x, double *y, double*vx, double*vy)
 {
 	equation(x,y,vx,vy);
 }
+
+void processMenuEvents(int);
 
 /*display utilities*/
 
@@ -223,8 +225,15 @@ int main(int argc, char* argv[])
 	glutInitWindowPosition(20, 20);
 	glutInitWindowSize(win_width, win_height);
 	glutCreateWindow("Scientific Visualization");
-
-
+	int menu = glutCreateMenu(processMenuEvents);
+	glutSetMenuFont(menu, GLUT_BITMAP_TIMES_ROMAN_24);
+	glutAddMenuEntry("Show/Hide Coordinate Sys", 0);
+	glutAddMenuEntry("Show/Hide Dots", 1);
+	glutAddMenuEntry("Unsteady Field", 2);
+	glutAddMenuEntry("Steady Field", 3);
+	glutAddMenuEntry("Ambient Motion", 4);
+	glutAddMenuEntry("Reset", 5);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
 	/*initialize openGL*/
 	init();
 
@@ -248,6 +257,9 @@ int main(int argc, char* argv[])
 	free(pixels);
 	return 0;
 }
+
+
+
 
 
 /******************************************************************************
@@ -762,6 +774,11 @@ void testEqu2(double* x, double* y, double* vx, double* vy) {
 	*vx = cos(*y+iframe);
 	*vy = sin(*x-0.5*iframe);
 }
+
+void testEqu3(double* x, double* y, double* vx, double* vy) {
+	*vx = 1.5 * (*x);
+	*vy = *y*cos(*x-0.5 *iframe);
+}
 void displayIBFV(void)
 {
 	glDisable(GL_LIGHTING);
@@ -911,8 +928,7 @@ std::vector<std::pair<PolyLine, float>> contours;
 
 void display(void)
 {
-	if(setInterval)
-		Sleep(100);
+	
 	glClearColor(1.0, 1.0, 1.0, 1.0);  // background for rendering color coding and lighting
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -974,7 +990,7 @@ void keyboard(unsigned char key, int x, int y) {
 			break;
 		}
 		case 'd': {
-			showDotsAndArrows = !showDotsAndArrows;
+			ShowDots = !ShowDots;
 			break;
 		}
 		case 'r':{
@@ -988,11 +1004,51 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 }
 
+//glutAddMenuEntry("Show/Hide Coordinate Sys", 0);
+//glutAddMenuEntry("Show/Hide Dots", 1);
+//glutAddMenuEntry("Unsteady Field", 2);
+//glutAddMenuEntry("Steady Field", 3);
+//glutAddMenuEntry("Ambient Motion", 4);
+//glutAddMenuEntry("Reset", 5);
+
+void processMenuEvents(int option) {
+
+	switch (option) {
+		case 0: {
+			showCoordinate = !showCoordinate;
+			break;
+		}
+		case 1: {
+			ShowDots = !ShowDots;
+			break;
+		}
+		case 2: {
+			display_mode = 1;
+			break;
+		}
+		case 3: {
+			display_mode = 2;
+			break;
+		}
+		case 4: {
+			display_mode = 3;
+			break;
+		}
+		case 5: {
+			mat_ident(rotmat);
+			translation[0] = 0;
+			translation[1] = 0;
+			zoom = 1.0;
+			glutPostRedisplay();
+			break;
+		}
+	}
+}
 /******************************************************************************
 Diaplay the polygon with visualization results
 ******************************************************************************/
 
-void drawLines(Polyhedron* poly, double width = 1.0, double R = 1.0, double G = 0.0, double B = 0.0) {
+void drawUnsteady(Polyhedron* poly, double width = 1.0, double R = 1.0, double G = 0.0, double B = 0.0) {
 
 	glDisable(GL_LIGHTING);
 	glEnable(GL_LINE_SMOOTH);
@@ -1005,18 +1061,88 @@ void drawLines(Polyhedron* poly, double width = 1.0, double R = 1.0, double G = 
 	glColor3f(R, G, B);
 	for (int i = 0; i < poly->nverts; i++) {
 		Vertex* temp_v = poly->vlist[i];
-		//temp_v->vx = cos(temp_v->y + iframe);
-		//temp_v->vy = sin(temp_v->x - 0.5 * iframe);
-		temp_v->vx = sin(iframe);
-		temp_v->vy = 1;
-		//printf("%f  %f\n", temp_v->vx, temp_v->vy);
+		
+		////////////////////////////////////////////////////
+		//testCase1
+		//vx = sin(t);
+		//vy = 1;
+		//Remove the next line
+		setVector(testEqu1, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
+
+		////////////////////////////////////////////////////
+		//testCase2
+		//vx = cos(y + t)
+		//vy = sin(x - 0.5 * t)
+		//Remove the next line
+		//setVector(testEqu2, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
+
+
+		//printf("%f  %f\n", temp_v->vx, temp_v->vy); 
 		glVertex3f(temp_v->x, temp_v->y, 0);
-		glVertex3f(temp_v->vx*0.7+ temp_v->x, temp_v->vy*0.7+temp_v->y, 0);
+		double x = temp_v->x; 
+		double y = temp_v->y;
+		double vx = temp_v->vx;
+		double vy = temp_v->vy;
+		double k = (vy) / (vx);
+		double angle = atan(k);
+		//double k = 1 / pow(x, 2.0);
+		/*vx = 1 / sqrt(1.0 + pow(k, 2.0));
+		if (k > 0) {
+			vx = 1 / sqrt(1.0 + pow(k, 2.0));
+			vy = k * vx;
+		}
+		else {
+			vx = -1 / sqrt(1.0 + pow(k, 2.0));
+			vy = k * vx;
+		}*/
+		glVertex3f(vx + x, vy + y, 0);
+
+		//glVertex3f(temp_v->vx * tan(angle) + temp_v->x, temp_v->vy * tan(angle) + temp_v->y, 0);
 	}
-	
+	iframe += 1;
 	glEnd();
 
 	glDisable(GL_BLEND);
+}
+
+void drawDotsInField(Polyhedron* poly, double radius = 0.1, double R = 1.0, double G = 0.0, double B = 0.0) {
+
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	glPolygonOffset(1., 1.);
+	glEnable(GL_DEPTH_TEST);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+
+	GLfloat mat_diffuse[4];
+
+	{
+		mat_diffuse[0] = R;
+		mat_diffuse[1] = G;
+		mat_diffuse[2] = B;
+		mat_diffuse[3] = 1.0;
+	}
+
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+
+	GLUquadric* quad = gluNewQuadric();
+	glPointSize(5.0f);
+	for (int i = 0; i < poly->nverts; i++) {
+		Vertex* temp_v = poly->vlist[i];
+		//glPushMatrix();
+		//glTranslatef(temp_v->x, temp_v->y, 0.0);
+		//gluSphere(quad, radius, 50, 50);
+		//glPopMatrix();
+		glBegin(GL_POINTS);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		
+		glVertex3f(temp_v->x, temp_v->y, 0);
+		glEnd();
+	}
+
+	gluDeleteQuadric(quad);
 }
 
 void drawCordinate(Polyhedron* poly){ 
@@ -1026,20 +1152,9 @@ void drawCordinate(Polyhedron* poly){
 	}
 }
 
-void drawDotsAndArrows(Polyhedron* poly) {
-	if (showDotsAndArrows) {
-		for (int i = 0; i < poly->nverts; i++) {
-			Vertex* temp_v = poly->vlist[i];
-			drawDot(temp_v->x, temp_v->y, 0);
-
-			//setVector(testEqu1, &temp_v->x, &temp_v->y, &temp_v->vx, &temp_v->vy);
-			//drawLineSegment(LineSegment(icVector3(temp_v->x, temp_v->y, 0), icVector3(temp_v->vx, temp_v->vy, 0)), 3);
-		}
-		drawLines(poly);
-		iframe += 1;
-		if (iframe == INT_MAX)
-			iframe = 0;
-		
+void drawDots(Polyhedron* poly) {
+	if (ShowDots) {
+		drawDotsInField(poly);
 	}
 }
 
@@ -1048,6 +1163,8 @@ void drawDotsAndArrows(Polyhedron* poly) {
 
 void display_polyhedron(Polyhedron* poly)
 {
+	if (setInterval)
+		Sleep(200);
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1., 1.);
 
@@ -1058,10 +1175,25 @@ void display_polyhedron(Polyhedron* poly)
 	switch (display_mode) {
 		case 1:{
 			//displayIBFV();
+			drawUnsteady(poly);
+			break;
 			
 		}
-
+		case 2: {
+			//displayIBFV();
+			drawUnsteady(poly);
+			break;
+		}
+		case 3: {
+			//displayIBFV();
+			drawUnsteady(poly);
+			break;
+		}
+			  
 	}
 	drawCordinate(poly);
-	drawDotsAndArrows(poly);
+	drawDots(poly);
+	
+	if (iframe == INT_MAX)
+		iframe = 0;
 }
