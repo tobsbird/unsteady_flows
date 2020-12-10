@@ -1,6 +1,0 @@
-C:\Users\tobst\Downloads\learnply_2020_v2\Debug\learnply.exe
-C:\Users\tobst\Downloads\learnply_2020_v2\Debug\learnply.pdb
-C:\Users\tobst\cmder\unsteady_flows\Debug\learnply.exe
-C:\Users\tobst\cmder\unsteady_flows\Debug\learnply.pdb
-C:\Users\xunaisen\Documents\unsteady_flows-main\Debug\learnply.exe
-C:\Users\xunaisen\Documents\unsteady_flows-main\Debug\learnply.pdb
